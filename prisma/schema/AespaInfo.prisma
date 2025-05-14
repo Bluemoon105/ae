@@ -1,0 +1,12 @@
+model AespaInfo {
+  id          String   @id @default(cuid())
+  description String
+  debutDate   DateTime
+  agency      String
+  homepage    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members AespaMember[]
+  albums  Album[] // 🔗 AespaInfo와 Album: 1:N
+}

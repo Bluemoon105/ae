@@ -1,0 +1,9 @@
+model Submission {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

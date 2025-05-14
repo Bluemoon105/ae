@@ -1,0 +1,17 @@
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  posts       Post[]
+  submissions Submission[]
+  uploads     ImageUpload[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}

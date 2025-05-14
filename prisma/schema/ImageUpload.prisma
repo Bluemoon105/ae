@@ -1,0 +1,8 @@
+model ImageUpload {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  createdAt DateTime @default(now())
+}

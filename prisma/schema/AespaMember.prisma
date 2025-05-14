@@ -1,0 +1,17 @@
+model AespaMember {
+  id        String   @id @default(cuid())
+  name      String
+  birthDate DateTime
+  position  String
+  bio       String
+  SnsId     String
+  SnsUrl    String
+  imageUrl  String?
+
+  aespaInfo   AespaInfo @relation(fields: [aespaInfoId], references: [id])
+  aespaInfoId String
+
+  albums    Album[] // 🔗 AespaMember와 Album: 1:N (개인 활동 앨범 등)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
