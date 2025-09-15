@@ -1,0 +1,14 @@
+model Live {
+  id         String         @id @default(cuid())
+  artistId   String
+  artist     User           @relation("ArtistLives", fields: [artistId], references: [id])
+  title      String
+  visibility PostVisibility @default(PUBLIC)
+  status     LiveStatus     @default(LIVE)
+  createdAt  DateTime       @default(now())
+}
+
+enum LiveStatus {
+  LIVE
+  ENDED
+}

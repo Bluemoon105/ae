@@ -1,0 +1,13 @@
+model Membership {
+  id        String           @id @default(cuid())
+  userId    String           @unique
+  user      User             @relation(fields: [userId], references: [id])
+  status    MembershipStatus @default(ACTIVE)
+  startedAt DateTime         @default(now())
+  endedAt   DateTime
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPRIRED
+}

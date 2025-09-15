@@ -1,0 +1,10 @@
+model Event {
+  id             String   @id @default(cuid())
+  title          String
+  description    String?
+  startTime      DateTime
+  endTime        DateTime
+  membershipOnly Boolean  @default(true)
+
+  applications EventApplication[]
+}
