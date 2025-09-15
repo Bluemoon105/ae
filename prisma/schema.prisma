@@ -1,0 +1,184 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  nickname     String   @unique
+  name         String
+  role         UserRole @default(FAN_FREE)
+  profileImage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships   Membership?
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  orders        Order[]
+  applications  EventApplication[]
+  notifications Notification[]
+  lives         Live[]             @relation("ArtistLives")
+}
+
+model Membership {
+  id        String           @id @default(cuid())
+  userId    String           @unique
+  user      User             @relation(fields: [userId], references: [id])
+  status    MembershipStatus @default(ACTIVE)
+  startedAt DateTime         @default(now())
+  endedAt   DateTime
+}
+
+model Event {
+  id             String   @id @default(cuid())
+  title          String
+  description    String?
+  startTime      DateTime
+  endTime        DateTime
+  membershipOnly Boolean  @default(true)
+
+  applications EventApplication[]
+}
+
+model EventApplication {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  appliedAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+}
+
+model Live {
+  id         String         @id @default(cuid())
+  artistId   String
+  artist     User           @relation("ArtistLives", fields: [artistId], references: [id])
+  title      String
+  visibility PostVisibility @default(PUBLIC)
+  status     LiveStatus     @default(LIVE)
+  createdAt  DateTime       @default(now())
+}
+
+model Post {
+  id         String         @id @default(cuid())
+  authorId   String
+  author     User           @relation(fields: [authorId], references: [id])
+  content    String
+  mediaUrl   String?
+  visibility PostVisibility @default(PUBLIC)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  comments Comment[]
+  likes    Like[]
+}
+
+model Like {
+  id     String @id @default(cuid())
+  postId String
+  post   Post   @relation(fields: [postId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Int
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  totalPrice  Int
+  totalAmount Int
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id])
+  quantity  Int
+  price     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+enum UserRole {
+  FAN_FREE
+  FAN_MEMBERSHIP
+  ARTIST
+  ADMIN
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPRIRED
+}
+
+enum LiveStatus {
+  LIVE
+  ENDED
+}
+
+enum PostVisibility {
+  PUBLIC
+  MEMBERSHIP
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
