@@ -20,9 +20,6 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
-      'https://amplify.ocs.navy',
-      'https://ocs.navy',
-      'https://www.ocs.navy',
     ],
     allowedHeaders: [
       'Authorization',
@@ -38,6 +35,6 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  await app.listen(3000);
+  await app.listen(8000);
 }
 bootstrap();
