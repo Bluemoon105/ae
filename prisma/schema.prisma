@@ -17,6 +17,8 @@ model User {
   id           String   @id @default(cuid())
   email        String   @unique
   password     String
+  refreshToken String?
+  point        Int      @default(0)
   nickname     String   @unique
   name         String
   role         UserRole @default(FAN_FREE)
