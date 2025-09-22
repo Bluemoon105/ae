@@ -10,7 +10,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   // admin.controller.ts
-  @Delete('user/:userId')
+  @Delete('user/:userId/delete')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
