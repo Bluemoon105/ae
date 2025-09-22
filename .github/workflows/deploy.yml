@@ -44,17 +44,18 @@ jobs:
 
       - name: Upload .env to EC2
         run: |
+          printf "%s" "${{ secrets.PROD_ENV_FILE }}" > .env
           scp -i ~/.ssh/id_rsa .env ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }}:~/backend/
+          rm -f .env
 
       - name: Deploy to EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} << 'EOF'
-            cd ~/backend
-            pnpm install --prod --ignore-scripts
-            pnpm prisma:generate:prod
-            pm2 stop snack25-be || true
-            pm2 start dist/main.js --name snack25-be --env production
-            pm2 save
+          ssh -i ~/.ssh/id_rsa ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} "mkdir -p ~/backend"
+          rsync -az --delete \
+            --exclude ".git" \
+            --exclude "node_modules" \
+            -e "ssh -i ~/.ssh/id_rsa" \
+           ./ ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }}:~/backend/
           EOF
 
       - name: Verify Deployment
