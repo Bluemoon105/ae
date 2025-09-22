@@ -11,6 +11,7 @@ export class UserService {
     if (!userId) {
       throw new BadRequestException('userId가 없습니다.');
     }
+    
 
     const user = await this.prisma.user.findUnique({
       where: {
@@ -40,11 +41,20 @@ export class UserService {
     if (nickname) {
       const existingUser = await this.prisma.user.findUnique({
         where: { nickname },
-      });
+    });
 
-      if (existingUser && existingUser.id !== userId) {
-        throw new BadRequestException('이미 사용 중인 닉네임입니다.');
-      }
+    if (!nickname && !profileImage) {
+      throw new BadRequestException('수정할 정보가 없습니다.');
+    }
+
+    const exists = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!exists) {
+      throw new NotFoundException('해당 사용자가 없습니다.');
+    }
+
+    if (existingUser && existingUser.id !== userId) {
+      throw new BadRequestException('이미 사용 중인 닉네임입니다.');
+    }
 
       return this.prisma.user.update({
         where: { id: userId },
