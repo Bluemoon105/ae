@@ -67,16 +67,36 @@ jobs:
             -e "ssh -i ~/.ssh/id_rsa" \
            ./ ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }}:~/backend/
 
-      - name: Install dependencies on EC2 & Generate Prisma
+      - name: Install dependencies on EC2 & Generate Prisma, manage PM2
         run: |
           ssh -i ~/.ssh/id_rsa ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} << 'EOF'
+            set -euo pipefail
             cd ~/backend
-            pnpm install --prod --ignore-scripts
-            pnpm prisma generate
-            pm2 stop snack25-be || true
-            pm2 start dist/main.js --name snack25-be --env production
-            pm2 save
-          EOF
+
+            # Ensure pnpm is available
+            if ! command -v pnpm >/dev/null 2>&1; then
+              command -v corepack >/dev/null 2>&1 && corepack enable || true
+              corepack prepare pnpm@latest --activate || true
+            fi
+            pnpm --version
+
+            # Install production deps (allow scripts for postinstall like Prisma)
+            pnpm install --prod
+
+            # Generate Prisma Client even without devDependencies
+            if ! command -v prisma >dev/null 2&1; then
+              pnpm dlx prisma generate
+            else
+              pnpm prisma generate
+            fi
+
+            # Ensure PM2 is avaliable
+            if command -v pm2 >/dev/null 2&1; then
+              PM2 = "pm2"
+            else
+              PM2 = "pnpm dlx pm2"
+            fi
+
 
       - name: Verify Deployment
         run: |
