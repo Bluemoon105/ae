@@ -25,6 +25,7 @@ export class UserService {
         profileImage: true,
         point: true,
         role: true,
+        isBlocked: true,
       },
     });
 
