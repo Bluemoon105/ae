@@ -97,6 +97,12 @@ jobs:
               PM2 = "pnpm dlx pm2"
             fi
 
+            @ Restart app with NODE_ENV set
+            $PM2 stop ae || true
+            NODE_ENV=production $PM2 start dist/main.js --name ae
+            $PM2 save
+          EOF
+
 
       - name: Verify Deployment
         run: |
