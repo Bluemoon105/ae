@@ -35,8 +35,8 @@ export class AdminController {
     return this.adminService.createNotice(dto);
   }
 
-  @Post('event') 
-  @ApiOperation({ summary: '관리자용 이벤트 등록', description: '관리자가 새로운 이벤트를 등록합니다.' })
+  @Post('event')
+  @ApiOperation({ summary: '이벤트 등록', description: '관리자가 이벤트를 등록합니다.' })
   async createEvent(@Body() dto: CreateEventDto) {
     return this.adminService.createEvent(dto);
   }

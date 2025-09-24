@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { CreateNoticeDto } from './dto/create-notice.dto';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -28,8 +28,27 @@ async deleteUser(userId: string) {
     return { message: '공지사항이 등록되었습니다.', notice };
   }
 
-  async createEvent(dto: CreateEventDto) {
-    const event = await this.prisma.event.create({ data: dto });
+   async createEvent(dto: CreateEventDto) {
+    const start = new Date(dto.startTime);
+    const end = new Date(dto.endTime);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      throw new BadRequestException('유효하지 않은 날짜 형식입니다. ISO 8601 형식으로 전달하세요.');
+    }
+
+    if (end <= start) {
+      throw new BadRequestException('종료 시간이 시작 시간보다 빠를 수 없습니다.');
+    }
+
+    const event = await this.prisma.event.create({
+      data: {
+        title: dto.title,
+        description: dto.description,
+        startTime: start,
+        endTime: end,
+      },
+    });
+
     return { message: '이벤트가 등록되었습니다.', event };
   }
 

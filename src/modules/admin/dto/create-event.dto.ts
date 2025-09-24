@@ -1,20 +1,19 @@
-import { IsString, IsDateString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, IsISO8601 } from 'class-validator';
 
 export class CreateEventDto {
-  @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   title: string;
 
-  @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   description: string;
 
-  @ApiProperty()
-  @IsDateString()
-  startTime: string; // Date로 저장할 예정, 문자열로 받아서 변환
+  @IsNotEmpty()
+  @IsISO8601()
+  startTime: string;
 
-  @ApiProperty()
-  @IsDateString()
+  @IsNotEmpty()
+  @IsISO8601()
   endTime: string;
 }
